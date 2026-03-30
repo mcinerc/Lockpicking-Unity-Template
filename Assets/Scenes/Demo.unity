@@ -422,8 +422,8 @@ MonoBehaviour:
   tumblerOrigin: {fileID: 79811201}
   lockpick: {fileID: 134096057}
   lockpickTarget: {fileID: 1997984475}
-  numberOfTumblers: 12
-  tumblerSpacing: 0.5
+  numberOfTumblers: 5
+  tumblerSpacing: 1
   lockpickSpeed: 10
   lockpickBaseHeight: -1
   lockpickPickingHeight: 0

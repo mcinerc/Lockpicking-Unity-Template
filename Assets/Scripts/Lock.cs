@@ -16,9 +16,7 @@ public class Lock : MonoBehaviour
     [SerializeField] private Transform lockpick;
     [SerializeField] private Transform lockpickTarget;
     
-    [Header("Settings")]
-    [SerializeField] private int numberOfTumblers; // you can have any number of tumblers you want
-    [SerializeField] private float tumblerSpacing; // physical X distance between tumblers
+    [Header("Lock Settings")]
     [SerializeField] private float lockpickSpeed = 1f; // how fast the lockpick moves on the X axis
     
     [SerializeField] private float lockpickBaseHeight = -1f; // Y height that the lockpick sits at
@@ -26,6 +24,23 @@ public class Lock : MonoBehaviour
 
     [SerializeField] private float pickingHalfLength = 0.5f; // total time the lockpick spends moving up and down during a pick, split between an up and down motion, thus half-length
     [SerializeField] private int numberOfTumblersRetainedOnFailure = 0; // when failing to pick a tumbler, this amount will stay set, akin to higher thieving levels in TES4
+    
+    [Header("Tumbler Settings")]
+    // basic tumbler settings
+    [SerializeField] private int numberOfTumblers; // you can have any number of tumblers you want
+    [SerializeField] private float tumblerSpacing; // physical X distance between tumblers
+    
+    // how fast the tumblers move up when picked
+    [SerializeField] private float minRaiseTime = 0.1f;
+    [SerializeField] private float maxRaiseTime = 0.5f;
+    
+    // how long the tumblers stay up and in a pickable state
+    [SerializeField] private float minPickableTime = 0.1f;
+    [SerializeField] private float maxPickableTime = 0.5f;
+    
+    // how long it takes the tumblers to return to neutral
+    [SerializeField] private float minFallingTime = 0.1f;
+    [SerializeField] private float maxFallingTime = 0.5f;
 
     private List<Tumbler> _tumblers;
     private int _currentTumbler = 0;
@@ -49,7 +64,9 @@ public class Lock : MonoBehaviour
         {
             GameObject newTumbler = Instantiate(tumblerPrefab, tumblerOrigin);
             newTumbler.transform.position += new Vector3(tumblerSpacing * i, 0f, 0f);
-            _tumblers.Add(newTumbler.GetComponent<Tumbler>());
+            Tumbler t = newTumbler.GetComponent<Tumbler>();
+            t.Initialize(minRaiseTime, maxRaiseTime, minPickableTime, maxPickableTime, minFallingTime, maxFallingTime);
+            _tumblers.Add(t);
         }
 
         lockpickTarget.position = new Vector3(CurrentTumbler.transform.position.x, lockpickBaseHeight, 0f);

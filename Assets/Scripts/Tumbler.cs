@@ -1,42 +1,33 @@
 using System;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public enum TumblerState { Idle, Rising, Pickable, Falling, Set }
 
 public class Tumbler : MonoBehaviour
 {
+    private const float SpringMinSize = 0.1f;
+    
     [Header("References")]
     [SerializeField] private Transform spring;
     [SerializeField] private Transform tumbler;
     [SerializeField] private Transform tumblerTarget;
-
+    
     [Header("Settings")]
-    [SerializeField] private float springMinSize = 0.1f;
-    
     // how fast the tumblers move up when picked
-    [SerializeField] private float minRaiseTime = 0.1f;
-    [SerializeField] private float maxRaiseTime = 0.5f;
-    
-    // how long the tumblers stay up and in a pickable state
-    [SerializeField] private float minPickableTime = 0.1f;
-    [SerializeField] private float maxPickableTime = 0.5f;
-    
-    // how long it takes the tumblers to return to neutral
-    [SerializeField] private float minFallingTime = 0.1f;
-    [SerializeField] private float maxFallingTime = 0.5f;
+    private float _minRaiseTime;
+    private float _maxRaiseTime;
+    private float _minPickableTime;
+    private float _maxPickableTime;
+    private float _minFallingTime;
+    private float _maxFallingTime;
 
     private TumblerState _state = TumblerState.Idle;
     private float _timer = 0f; // timer used for all state transitions
     private float _target = 0f; // target time used for all state transitions
     private Vector3 _targetSize;
-
-    private void Awake()
-    {
-        _targetSize = new Vector3(1f, springMinSize, 1f);
-        Reset();
-    }
 
     private void Update()
     {
@@ -52,7 +43,7 @@ public class Tumbler : MonoBehaviour
             if (_timer > _target)
             {
                 _timer = 0f;
-                _target = Random.Range(minPickableTime, maxPickableTime);
+                _target = Random.Range(_minPickableTime, _maxPickableTime);
                 spring.transform.localScale = _targetSize;
                 _state = TumblerState.Pickable;
             }
@@ -64,7 +55,7 @@ public class Tumbler : MonoBehaviour
             if (_timer > _target)
             {
                 _timer = 0f;
-                _target = Random.Range(minFallingTime, maxFallingTime);
+                _target = Random.Range(_minFallingTime, _maxFallingTime);
                 _state = TumblerState.Falling;
             }
         }
@@ -78,11 +69,23 @@ public class Tumbler : MonoBehaviour
             if (_timer > _target)
             {
                 _timer = 0f;
-                _target = Random.Range(minRaiseTime, maxRaiseTime);
+                _target = Random.Range(_minRaiseTime, _maxRaiseTime);
                 spring.transform.localScale = Vector3.one;
                 _state = TumblerState.Idle;
             }
         }
+    }
+    
+    public void Initialize(float minRaise, float maxRaise, float minPickable, float maxPickable, float minFall, float maxFall)
+    {
+        _targetSize = new Vector3(1f, SpringMinSize, 1f);
+        _minRaiseTime = minRaise;
+        _maxRaiseTime = maxRaise;
+        _minPickableTime = minPickable;
+        _maxPickableTime = maxPickable;
+        _minFallingTime = minFall;
+        _maxFallingTime = maxFall;
+        Reset();
     }
     
     public void KnockTumbler()
@@ -102,7 +105,7 @@ public class Tumbler : MonoBehaviour
     {
         _state = TumblerState.Idle;
         spring.transform.localScale = Vector3.one;
-        _target = Random.Range(minRaiseTime, maxRaiseTime);
+        _target = Random.Range(_minRaiseTime, _maxRaiseTime);
     }
 
     public void Set()
